@@ -74,7 +74,13 @@
   <section style="margin-top: 2rem;">
     <h2>Results</h2>
 
+    <% if @suggestion_message.present? %>
+      <p><%= @suggestion_message %></p>
+    <% else %>
+
     <p>Found <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> for you!</p>
+
+    <% end %>
 
     <table role="grid" class="results-table">
       <thead>
@@ -93,7 +99,11 @@
               </a>
             </td>
             <td><%= (movie["vote_average"] || 0).round(1) %></td>
-            <td><%= movie["release_date"] %></td>
+            <td>  <% raw_date = movie["release_date"] %>
+              <% if raw_date.present? %>
+                <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
+              <% end %>
+              </td>
           </tr>
         <% end %>
       </tbody>

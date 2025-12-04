@@ -11,6 +11,18 @@ class MoviesController < ApplicationController
 
     base_url = "https://api.themoviedb.org/3"
 
+    filter_keys = %w[min_rating max_runtime genre_id query provider]
+
+    # to detect if form has ever been submitted
+    form_submitted = filter_keys.any? { |k| params.key?(k) }
+
+    # First visit / hard refresh with no query string: just show the form
+    unless form_submitted
+      @movies = []
+      @suggestion_message = nil
+      return render template: "movies_templates/index"
+    end
+
     min_rating = params[:min_rating]
     max_runtime = params[:max_runtime]
     genre_id = params[:genre_id]
@@ -25,13 +37,24 @@ class MoviesController < ApplicationController
       provider,
     ].any?(&:present?)
 
-    unless filters_present
-      @movies = []
-      return render template: "movies_templates/index"
-    end
+       if !filters_present
+      # if no fields field, show a default recommendations list
+      response = HTTParty.get(
+        "#{base_url}/discover/movie",
+        query: {
+          api_key: api_key,
+          language: "en-US",
+          sort_by: "vote_average.desc",   # highest rated first
+          "vote_count.gte": 1000,         # to avoid weird obscure stuff
+          include_adult: false
+        }
+      )
 
+      @movies = response["results"] || []
+      @suggestion_message = "Looks like you're not picky today, so here are some top movies for you 🍿"
+    else
     if query.present?
-      # 🔎 Search by title – TMDB /search/movie
+      # Search by title
       response = HTTParty.get(
         "#{base_url}/search/movie",
         query: {
@@ -42,7 +65,7 @@ class MoviesController < ApplicationController
         },
       )
     else
-      # 🎛 Filtered discover – TMDB /discover/movie
+      # Discover with filters
       discover_query = {
         api_key: api_key,
         language: "en-US",
@@ -65,6 +88,8 @@ class MoviesController < ApplicationController
     end
 
     @movies = response["results"] || []
+  end
+
     sort = params[:sort].presence || "rating"  # default: rating desc
 
     case sort
