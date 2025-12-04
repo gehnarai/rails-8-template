@@ -1,31 +1,79 @@
 <h2>Hey, Gehna! What are we watching today?</h2>
 
 <form action="/" method="get">
-  <label for="min_rating_field">Min rating (0–10)</label>
-  <input
-    id="min_rating_field"
-    type="number"
-    name="min_rating"
-    value="<%= params[:min_rating] %>"
-  >
+  <div class="grid">
+    <div>
+      <label for="query_field">🔎 Search by title</label>
+      <input
+        id="query_field"
+        type="text"
+        name="query"
+        placeholder="E.g. Parasite, Gladiator..."
+        value="<%= params[:query] %>"
+      >
+    </div>
 
-  <label for="max_runtime_field">Max runtime (minutes)</label>
-  <input
-    id="max_runtime_field"
-    type="number"
-    name="max_runtime"
-    value="<%= params[:max_runtime] %>"
-  >
+    <div>
+      <label for="genre_field">🎭 Genre</label>
+      <select id="genre_field" name="genre_id">
+        <option value="">Any genre</option>
+        <option value="28"   <%= "selected" if params[:genre_id] == "28" %>>Action</option>
+        <option value="35"   <%= "selected" if params[:genre_id] == "35" %>>Comedy</option>
+        <option value="18"   <%= "selected" if params[:genre_id] == "18" %>>Drama</option>
+        <option value="27"   <%= "selected" if params[:genre_id] == "27" %>>Horror</option>
+        <option value="10749"<%= "selected" if params[:genre_id] == "10749" %>>Romance</option>
+        <option value="878"  <%= "selected" if params[:genre_id] == "878" %>>Sci-Fi</option>
+        <option value="16"   <%= "selected" if params[:genre_id] == "16" %>>Animation</option>
+        <option value="99"   <%= "selected" if params[:genre_id] == "99" %>>Documentary</option>
+      </select>
+    </div>
 
-  <button>Find movies</button>
-  <a href="/">Clear filters</a>
+    <div>
+      <label for="min_rating_field">⭐ Min rating (0–10)</label>
+      <input
+        id="min_rating_field"
+        type="number"
+        name="min_rating"
+        value="<%= params[:min_rating] %>"
+        min="0"
+        max="10"
+        step="0.5"
+      >
+    </div>
+
+    <div>
+      <label for="max_runtime_field">⏱ Max runtime (minutes)</label>
+      <input
+        id="max_runtime_field"
+        type="number"
+        name="max_runtime"
+        value="<%= params[:max_runtime] %>"
+        min="30"
+      >
+    </div>
+
+    <div>
+      <label for="provider_field">📺 Where to watch</label>
+      <select id="provider_field" name="provider">
+        <option value="">Any service</option>
+        <option value="netflix" <%= "selected" if params[:provider] == "netflix" %>>Netflix</option>
+        <option value="prime"   <%= "selected" if params[:provider] == "prime" %>>Prime Video</option>
+        <option value="disney"  <%= "selected" if params[:provider] == "disney" %>>Disney+</option>
+        <option value="hulu"    <%= "selected" if params[:provider] == "hulu" %>>Hulu</option>
+      </select>
+    </div>
+
+    <div>
+      <label>&nbsp;</label>
+      <button>🎬 Find movies</button>
+      <a href="/">Clear filters</a>
+    </div>
+  </div>
 </form>
 
 <h2>Results</h2>
 
-<p>Params: <%= params.inspect %></p> <!-- temporary debug so you can see filters -->
-
-<p>Found <%= @movies.size %> movies.</p>
+<p>Found <%= @movies.size %> movie for you!</p>
 
 <ul>
   <% @movies.each do |movie| %>
