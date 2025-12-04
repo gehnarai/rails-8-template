@@ -62,25 +62,37 @@
         <option value="hulu"    <%= "selected" if params[:provider] == "hulu" %>>Hulu</option>
       </select>
     </div>
-
-    <div>
-      <label>&nbsp;</label>
-      <button>🎬 Find movies</button>
-      <a href="/">Clear filters</a>
     </div>
-  </div>
+
+  <div style="text-align: center; margin-top: 1rem;">
+    <button>🎬 Find movies</button>
+    <a href="/">Clear filters</a>
+    </div>
 </form>
 
-<h2>Results</h2>
+<% if @movies.present? %>
+  <section style="margin-top: 2rem;">
+    <h2>Results</h2>
 
-<p>Found <%= @movies.size %> movie for you!</p>
+    <p>Found <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> for you!</p>
 
-<ul>
-  <% @movies.each do |movie| %>
-    <li>
-      <strong><%= movie["title"] %></strong>
-      – ⭐ <%= movie["vote_average"] %>
-      – <%= movie["release_date"] %>
-    </li>
-  <% end %>
-</ul>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>Movie</th>
+          <th> ⭐ Rating </th>
+          <th>Release date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @movies.each do |movie| %>
+          <tr>
+            <td><strong><%= movie["title"] %></strong></td>
+            <td><%= movie["vote_average"] %></td>
+            <td><%= movie["release_date"] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+<% end %>

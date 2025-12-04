@@ -17,6 +17,19 @@ class MoviesController < ApplicationController
     query       = params[:query]
     provider    = params[:provider]
 
+      filters_present = [
+      min_rating,
+      max_runtime,
+      genre_id,
+      query,
+      provider
+    ].any?(&:present?)
+
+    unless filters_present
+      @movies = []
+      return render template: "movies_templates/index"
+    end
+
      if query.present?
       # 🔎 Search by title – TMDB /search/movie
       response = HTTParty.get(
