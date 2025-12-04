@@ -1,0 +1,28 @@
+<h1>Trending Movies (from TMDB)</h1>
+
+<% if @error.present? %>
+  <p style="color: red;"><%= @error %></p>
+<% end %>
+
+<p>Total movies: <%= @movies.size %></p>
+
+<table border="1" cellpadding="4">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Rating</th>
+      <th>Release Date</th>
+      <th>Raw JSON (debug)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @movies.each do |movie| %>
+      <tr>
+        <td><%= movie["title"] %></td>
+        <td><%= movie["vote_average"] %></td>
+        <td><%= movie["release_date"] %></td>
+        <td><pre><%= movie.inspect %></pre></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
