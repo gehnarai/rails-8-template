@@ -78,4 +78,58 @@ class MoviesController < ApplicationController
 
     render({ :template => "movies_templates/index" })
   end
+
+  def show
+    api_key = ENV["TMDB_API_KEY"]
+    movie_id = params[:id]
+    base_url = "https://api.themoviedb.org/3"
+
+    # Main movie details
+    detail_response = HTTParty.get(
+      "#{base_url}/movie/#{movie_id}",
+      query: {
+        api_key: api_key,
+        language: "en-US",
+      },
+    )
+
+    # Cast / credits
+    credits_response = HTTParty.get(
+      "#{base_url}/movie/#{movie_id}/credits",
+      query: {
+        api_key: api_key,
+        language: "en-US",
+      },
+    )
+
+    # Where to watch
+    providers_response = HTTParty.get(
+      "#{base_url}/movie/#{movie_id}/watch/providers",
+      query: {
+        api_key: api_key,
+      },
+    )
+
+    @movie = detail_response.parsed_response
+
+    # Top 5 cast members
+    @cast = (credits_response.parsed_response["cast"] || []).first(5)
+
+    # Streaming
+    region = params[:region].presence || "US"
+
+    providers_response = HTTParty.get(
+      "#{base_url}/movie/#{movie_id}/watch/providers",
+      query: { api_key: api_key },
+    )
+
+    us_providers = providers_response.parsed_response.dig("results", region) || {}
+    @streaming = {
+      flatrate: us_providers["flatrate"] || [],
+      rent: us_providers["rent"] || [],
+      buy: us_providers["buy"] || [],
+    }
+
+    render({ :template => "movies_templates/show" })
+  end
 end

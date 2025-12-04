@@ -16,3 +16,22 @@
   flex-direction: column;
   justify-content: flex-end; /* bottoms line up */
 }
+
+.movie-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;   /* stack vertically */
+  gap: 0.5rem;              /* space between buttons */
+  align-items: flex-start;  /* left align */
+}
+
+.movie-actions form {
+  margin: 0;
+}
+
+.results-table thead th {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.03);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}

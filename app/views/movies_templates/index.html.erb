@@ -76,7 +76,7 @@
 
     <p>Found <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> for you!</p>
 
-    <table role="grid">
+    <table role="grid" class="results-table">
       <thead>
         <tr>
           <th>Movie</th>
@@ -87,7 +87,11 @@
       <tbody>
         <% @movies.each do |movie| %>
           <tr>
-            <td><strong><%= movie["title"] %></strong></td>
+            <td>
+              <a href="/movies/<%= movie["id"] %>">
+              <strong><%= movie["title"] %></strong>
+              </a>
+            </td>
             <td><%= (movie["vote_average"] || 0).round(1) %></td>
             <td><%= movie["release_date"] %></td>
           </tr>

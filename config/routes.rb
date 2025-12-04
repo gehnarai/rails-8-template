@@ -4,4 +4,5 @@ Rails.application.routes.draw do
 
   get "/", controller: "movies", action: "index"
   get "/movies", controller: "movies", action: "index"
+  get "/movies/:id", controller: "movies", action: "show"
 end

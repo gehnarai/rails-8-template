@@ -1,0 +1,116 @@
+<article class="movie-card" style="max-width: 900px; margin: 0 auto;">
+  <div class="grid">
+    <div>
+      <% if @movie["poster_path"].present? %>
+        <img
+          src="https://image.tmdb.org/t/p/w500<%= @movie["poster_path"] %>"
+          alt="<%= @movie["title"] %> poster"
+          style="width: 260px; border-radius: 8px;"
+        >
+      <% end %>
+    </div>
+
+    <div>
+      <h1>
+        <%= @movie["title"] %>
+        <% if @movie["release_date"].present? %>
+          (<%= @movie["release_date"][0,4] %>)
+        <% end %>
+      </h1>
+
+      <p>
+        <strong>⭐ Rating:</strong>
+        <%= (@movie["vote_average"] || 0).round(1) %>
+      </p>
+
+      <p>
+        <strong>⏱ Runtime:</strong>
+        <%= @movie["runtime"] || 0 %> minutes
+      </p>
+
+      <p>
+        <strong>🎭 Genres:</strong>
+        <% if @movie["genres"].present? %>
+          <%= @movie["genres"].map { |g| g["name"] }.join(", ") %>
+        <% else %>
+          Not listed
+        <% end %>
+      </p>
+
+      <!-- Buttons -->
+<div class="movie-actions">
+  <form action="/insert_watchlist_item" method="post">
+    <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
+    <button>🍿 Add to Watchlist</button>
+  </form>
+
+  <form action="/mark_seen" method="post">
+    <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
+    <button>👀 Already seen</button>
+  </form>
+</div>
+  </div>
+  </div>
+
+
+  <!-- Overview -->
+  <section style="margin-top: 2rem;">
+    <h2>🔎 Overview </h2>
+    <p><%= @movie["overview"] %></p>
+  </section>
+
+  <!-- Cast -->
+  <section style="margin-top: 1.5rem;">
+    <h2>🎬 Cast</h2>
+    <% if @cast.present? %>
+      <ul>
+        <% @cast.each do |person| %>
+          <li>
+            <strong><%= person["name"] %></strong>
+            <% if person["character"].present? %>
+              as <%= person["character"] %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No cast information available.</p>
+    <% end %>
+  </section>
+
+  <!-- Where to watch -->
+  <section style="margin-top: 1.5rem;">
+    <h2>📺 Where to watch</h2>
+
+    <% if @streaming[:flatrate].present? || @streaming[:rent].present? || @streaming[:buy].present? %>
+      <% if @streaming[:flatrate].present? %>
+        <p><strong>Streaming:</strong></p>
+        <ul>
+          <% @streaming[:flatrate].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if @streaming[:rent].present? %>
+        <p><strong>Rent:</strong></p>
+        <ul>
+          <% @streaming[:rent].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if @streaming[:buy].present? %>
+        <p><strong>Buy:</strong></p>
+        <ul>
+          <% @streaming[:buy].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% else %>
+      <p>Not currently available on major streaming services in your region (according to TMDB).</p>
+    <% end %>
+  </section>
+</article>
