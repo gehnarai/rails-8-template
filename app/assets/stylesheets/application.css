@@ -10,3 +10,9 @@
  */
 
 @import "custom-image.css";
+
+.filters-row > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* bottoms line up */
+}

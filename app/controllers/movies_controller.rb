@@ -1,28 +1,28 @@
 class MoviesController < ApplicationController
-    PROVIDER_IDS = {
-    "netflix" => 8, 
-    "prime"   => 9,
-    "disney"  => 337,
-    "hulu"    => 15 
+  PROVIDER_IDS = {
+    "netflix" => 8,
+    "prime" => 9,
+    "disney" => 337,
+    "hulu" => 15,
   }.freeze
 
   def index
     api_key = ENV["TMDB_API_KEY"]
 
-     base_url = "https://api.themoviedb.org/3"
+    base_url = "https://api.themoviedb.org/3"
 
-    min_rating  = params[:min_rating]
+    min_rating = params[:min_rating]
     max_runtime = params[:max_runtime]
-    genre_id    = params[:genre_id]
-    query       = params[:query]
-    provider    = params[:provider]
+    genre_id = params[:genre_id]
+    query = params[:query]
+    provider = params[:provider]
 
-      filters_present = [
+    filters_present = [
       min_rating,
       max_runtime,
       genre_id,
       query,
-      provider
+      provider,
     ].any?(&:present?)
 
     unless filters_present
@@ -30,7 +30,7 @@ class MoviesController < ApplicationController
       return render template: "movies_templates/index"
     end
 
-     if query.present?
+    if query.present?
       # 🔎 Search by title – TMDB /search/movie
       response = HTTParty.get(
         "#{base_url}/search/movie",
@@ -38,8 +38,8 @@ class MoviesController < ApplicationController
           api_key: api_key,
           language: "en-US",
           query: query,
-          include_adult: false
-        }
+          include_adult: false,
+        },
       )
     else
       # 🎛 Filtered discover – TMDB /discover/movie
@@ -47,12 +47,12 @@ class MoviesController < ApplicationController
         api_key: api_key,
         language: "en-US",
         sort_by: "popularity.desc",
-        include_adult: false
+        include_adult: false,
       }
 
-      discover_query[:"vote_average.gte"] = min_rating  if min_rating.present?
+      discover_query[:"vote_average.gte"] = min_rating if min_rating.present?
       discover_query[:"with_runtime.lte"] = max_runtime if max_runtime.present?
-      discover_query[:with_genres]       = genre_id     if genre_id.present?
+      discover_query[:with_genres] = genre_id if genre_id.present?
 
       if provider.present?
         provider_id = PROVIDER_IDS[provider]
@@ -65,7 +65,17 @@ class MoviesController < ApplicationController
     end
 
     @movies = response["results"] || []
+    sort = params[:sort].presence || "rating"  # default: rating desc
 
-    render({:template => "movies_templates/index"})
+    case sort
+    when "title"
+      @movies.sort_by! { |m| (m["title"] || "").downcase }
+    when "release_date"
+      @movies.sort_by! { |m| m["release_date"] || "" }.reverse!  # newest first
+    else # "rating"
+      @movies.sort_by! { |m| m["vote_average"] || 0 }.reverse!   # highest rating first
+    end
+
+    render({ :template => "movies_templates/index" })
   end
 end

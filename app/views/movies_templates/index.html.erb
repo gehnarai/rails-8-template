@@ -1,7 +1,7 @@
 <h2>Hey, Gehna! What are we watching today?</h2>
 
 <form action="/" method="get">
-  <div class="grid">
+  <div class="grid filters-row"">
     <div>
       <label for="query_field">🔎 Search by title</label>
       <input
@@ -88,7 +88,7 @@
         <% @movies.each do |movie| %>
           <tr>
             <td><strong><%= movie["title"] %></strong></td>
-            <td><%= movie["vote_average"] %></td>
+            <td><%= (movie["vote_average"] || 0).round(1) %></td>
             <td><%= movie["release_date"] %></td>
           </tr>
         <% end %>
