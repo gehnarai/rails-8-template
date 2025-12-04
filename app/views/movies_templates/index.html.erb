@@ -1,28 +1,38 @@
-<h1>Trending Movies (from TMDB)</h1>
+<h2>Hey, Gehna! What are we watching today?</h2>
 
-<% if @error.present? %>
-  <p style="color: red;"><%= @error %></p>
-<% end %>
+<form action="/" method="get">
+  <label for="min_rating_field">Min rating (0–10)</label>
+  <input
+    id="min_rating_field"
+    type="number"
+    name="min_rating"
+    value="<%= params[:min_rating] %>"
+  >
 
-<p>Total movies: <%= @movies.size %></p>
+  <label for="max_runtime_field">Max runtime (minutes)</label>
+  <input
+    id="max_runtime_field"
+    type="number"
+    name="max_runtime"
+    value="<%= params[:max_runtime] %>"
+  >
 
-<table border="1" cellpadding="4">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Rating</th>
-      <th>Release Date</th>
-      <th>Raw JSON (debug)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @movies.each do |movie| %>
-      <tr>
-        <td><%= movie["title"] %></td>
-        <td><%= movie["vote_average"] %></td>
-        <td><%= movie["release_date"] %></td>
-        <td><pre><%= movie.inspect %></pre></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+  <button>Find movies</button>
+  <a href="/">Clear filters</a>
+</form>
+
+<h2>Results</h2>
+
+<p>Params: <%= params.inspect %></p> <!-- temporary debug so you can see filters -->
+
+<p>Found <%= @movies.size %> movies.</p>
+
+<ul>
+  <% @movies.each do |movie| %>
+    <li>
+      <strong><%= movie["title"] %></strong>
+      – ⭐ <%= movie["vote_average"] %>
+      – <%= movie["release_date"] %>
+    </li>
+  <% end %>
+</ul>
