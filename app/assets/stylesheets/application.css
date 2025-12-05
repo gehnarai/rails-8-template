@@ -35,3 +35,37 @@
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 2rem; 
+}
+
+/* LEFT: just the logo/title */
+.nav-left {
+  flex: 0 0 auto;
+}
+
+/* CENTER: stretches and centers the links */
+.nav-center {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-center ul {
+  display: flex;
+  gap: 2rem;
+}
+
+/* RIGHT: sticks to the far right */
+.nav-right {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.nav-right ul {
+  display: flex;
+  gap: 1.5rem;
+}

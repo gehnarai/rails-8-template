@@ -34,42 +34,37 @@
 
   <body class="pico">
     <header>
-      <div class="container-two-thirds">
-        <nav>
+        <nav class="top-nav">
+        <div class = "nav_left">
           <!-- Left: App name -->
-          <ul>
+          <ul style="display: flex; gap: 1rem;">
             <li>
               <a href="/">
                 <strong>ChoozayMovie</strong>
               </a>
             </li>
           </ul>
+          </div>
 
-          <!-- Center: main sections -->
+          <!-- Center: main sections only for signed in users -->
+          <div class = "nav-center">
+          <% if user_signed_in? %>
           <ul>
             <li>
               <a href="/">Home</a>
             </li>
-
-            <% if user_signed_in? %>
               <li>
                 <a href="/watchlist">My Watchlist</a>
               </li>
               <li>
                 <a href="/seen">Movie History</a>
               </li>
-            <% else %>
-              <!-- Not signed in: send them to login if they click these -->
-              <li>
-                <a href="/users/sign_in">My Watchlist</a>
-              </li>
-              <li>
-                <a href="/users/sign_in"></a>
-              </li>
-            <% end %>
           </ul>
+           <% end %>
+          </div>
 
           <!-- Right: region + user actions -->
+          <div class = "nav-right">
           <ul>
             <li>
               <!-- placeholder for now; later this can be a dropdown -->
@@ -92,8 +87,8 @@
               </li>
             <% end %>
           </ul>
+          </div>
         </nav>
-      </div>
     </header>
 
     <main>

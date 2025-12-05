@@ -1,4 +1,8 @@
 class MoviesController < ApplicationController
+
+  # require sign in for movie details page 
+  before_action :authenticate_user!, only: [:show]
+
   PROVIDER_IDS = {
     "netflix" => 8,
     "prime" => 9,
