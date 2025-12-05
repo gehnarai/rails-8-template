@@ -81,6 +81,7 @@ class MoviesController < ApplicationController
           language: "en-US",
           sort_by: "popularity.desc",
           include_adult: false,
+          region: REGION,
         }
 
         discover_query[:"vote_average.gte"] = min_rating if min_rating.present?
@@ -92,8 +93,11 @@ class MoviesController < ApplicationController
           if provider_id
             discover_query[:with_watch_providers] = provider_id
             discover_query[:watch_region] = REGION
-            discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
+            discover_query[:with_watch_monetization_types] = "flatrate|ads|free"
           end
+        else
+          # ifo specific provider filter
+          discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
         end
 
         response = HTTParty.get("#{base_url}/discover/movie", query: discover_query)
