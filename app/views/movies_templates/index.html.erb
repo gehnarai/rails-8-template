@@ -1,4 +1,8 @@
-<h2>Hey, <%= current_user %> what are we watching today?</h2>
+<% if user_signed_in? %>
+  <h2>Hey, <%= current_user.name %>! What are we watching today?</h2>
+<% else %>
+  <h2>Hey, movie fan! What are we watching today?</h2>
+<% end %>
 
 <form action="/" method="get">
   <div class="grid filters-row"">
@@ -56,10 +60,12 @@
       <label for="provider_field">📺 Where to watch</label>
       <select id="provider_field" name="provider">
         <option value="">Any service</option>
+        <option value="apple_tv"   <%= "selected" if params[:provider] == "apple_tv" %>>Apple TV</option>
+        <option value="disney"  <%= "selected" if params[:provider] == "disney" %>>Disney+</option>
+         <option value="hbo_max"    <%= "selected" if params[:provider] == "hbo_max" %>>HBO Max</option>
+             <option value="hulu"    <%= "selected" if params[:provider] == "hulu" %>>Hulu</option>
         <option value="netflix" <%= "selected" if params[:provider] == "netflix" %>>Netflix</option>
         <option value="prime"   <%= "selected" if params[:provider] == "prime" %>>Prime Video</option>
-        <option value="disney"  <%= "selected" if params[:provider] == "disney" %>>Disney+</option>
-        <option value="hulu"    <%= "selected" if params[:provider] == "hulu" %>>Hulu</option>
       </select>
     </div>
     </div>
@@ -69,6 +75,12 @@
     <a href="/">Clear filters</a>
     </div>
 </form>
+
+<% if params[:query].present? && (params[:provider].present? || params[:max_runtime].present?) %>
+  <p style="font-size: 0.8rem; opacity: 0.7; margin-top: -0.5rem;">
+    ℹ️ Note: When searching by title, "Max runtime" and “Where to watch” filters don't apply due to API limitations.
+  </p>
+<% end %>
 
 <% if @movies.present? %>
   <section style="margin-top: 2rem;">

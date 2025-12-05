@@ -8,6 +8,8 @@ class MoviesController < ApplicationController
     "prime" => 9,
     "disney" => 337,
     "hulu" => 15,
+    "apple_tv" => 2,
+    "hbo_max" => 1899
   }.freeze
 
   def index
@@ -85,14 +87,39 @@ class MoviesController < ApplicationController
         provider_id = PROVIDER_IDS[provider]
         if provider_id
           discover_query[:with_watch_providers] = provider_id
+          discover_query[:watch_region]         = "US"
         end
       end
+
 
       response = HTTParty.get("#{base_url}/discover/movie", query: discover_query)
     end
 
     @movies = response["results"] || []
   end
+
+    # 🔍 Extra AND-filtering when a title is present
+    if query.present?
+      @movies.select! do |m|
+        ok = true
+
+        # filter by rating if provided
+        if min_rating.present?
+          ok &&= m["vote_average"].to_f >= min_rating.to_f
+        end
+
+        # filter by genre if provided (search results include genre_ids)
+        if genre_id.present?
+          ok &&= (m["genre_ids"] || []).include?(genre_id.to_i)
+        end
+
+        # NOTE: runtime & provider filters are *not* applied here,
+        # because /search/movie results don't include runtime or providers.
+        # (We'd need extra API calls per movie to do that.)
+
+        ok
+      end
+    end
 
     sort = params[:sort].presence || "rating"  # default: rating desc
 
@@ -112,6 +139,7 @@ class MoviesController < ApplicationController
     api_key = ENV["TMDB_API_KEY"]
     movie_id = params[:id]
     base_url = "https://api.themoviedb.org/3"
+    region   = "US"  # to update to region toggle
 
     # Main movie details
     detail_response = HTTParty.get(
@@ -152,11 +180,11 @@ class MoviesController < ApplicationController
       query: { api_key: api_key },
     )
 
-    us_providers = providers_response.parsed_response.dig("results", region) || {}
+    region_data = providers_response.parsed_response.dig("results", region) || {}
     @streaming = {
-      flatrate: us_providers["flatrate"] || [],
-      rent: us_providers["rent"] || [],
-      buy: us_providers["buy"] || [],
+      flatrate: region_data["flatrate"] || [],
+      rent: region_data["rent"] || [],
+      buy: region_data["buy"] || [],
     }
 
     render({ :template => "movies_templates/show" })
