@@ -1,6 +1,6 @@
 class MoviesController < ApplicationController
 
-  # require sign in for movie details page 
+  # require sign in for movie details page
   before_action :authenticate_user!, only: [:show]
 
   REGION = "US".freeze # provider_ids are region specific to keeping it to US only
@@ -11,7 +11,7 @@ class MoviesController < ApplicationController
     "disney" => 337,
     "hulu" => 15,
     "apple_tv" => 2,
-    "hbo_max" => 1899
+    "hbo_max" => 1899,
   }.freeze
 
   def index
@@ -45,7 +45,7 @@ class MoviesController < ApplicationController
       provider,
     ].any?(&:present?)
 
-       if !filters_present
+    if !filters_present
       # if no fields field, show a default recommendations list
       response = HTTParty.get(
         "#{base_url}/discover/movie",
@@ -55,53 +55,52 @@ class MoviesController < ApplicationController
           sort_by: "vote_average.desc",   # highest rated first
           "vote_count.gte": 1000,         # to avoid weird obscure stuff
           include_adult: false,
-          watch_region: REGION 
-        }
+          watch_region: REGION,
+        },
       )
 
       @movies = response["results"] || []
       @suggestion_message = "Looks like you're not picky today, so here are some top movies for you 🍿"
     else
-    if query.present?
-      # Search by title
-      response = HTTParty.get(
-        "#{base_url}/search/movie",
-        query: {
+      if query.present?
+        # Search by title
+        response = HTTParty.get(
+          "#{base_url}/search/movie",
+          query: {
+            api_key: api_key,
+            language: "en-US",
+            query: query,
+            include_adult: false,
+            watch_region: REGION,
+          },
+        )
+      else
+        # Discover with filters
+        discover_query = {
           api_key: api_key,
           language: "en-US",
-          query: query,
+          sort_by: "popularity.desc",
           include_adult: false,
-          watch_region: REGION 
-        },
-      )
-    else
-      # Discover with filters
-      discover_query = {
-        api_key: api_key,
-        language: "en-US",
-        sort_by: "popularity.desc",
-        include_adult: false,
-      }
+        }
 
-      discover_query[:"vote_average.gte"] = min_rating if min_rating.present?
-      discover_query[:"with_runtime.lte"] = max_runtime if max_runtime.present?
-      discover_query[:with_genres] = genre_id if genre_id.present?
+        discover_query[:"vote_average.gte"] = min_rating if min_rating.present?
+        discover_query[:"with_runtime.lte"] = max_runtime if max_runtime.present?
+        discover_query[:with_genres] = genre_id if genre_id.present?
 
-      if provider.present?
-        provider_id = PROVIDER_IDS[provider]
-        if provider_id
-          discover_query[:with_watch_providers] = provider_id
-          discover_query[:watch_region]         = REGION
-          discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
+        if provider.present?
+          provider_id = PROVIDER_IDS[provider]
+          if provider_id
+            discover_query[:with_watch_providers] = provider_id
+            discover_query[:watch_region] = REGION
+            discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
+          end
         end
+
+        response = HTTParty.get("#{base_url}/discover/movie", query: discover_query)
       end
 
-
-      response = HTTParty.get("#{base_url}/discover/movie", query: discover_query)
+      @movies = response["results"] || []
     end
-
-    @movies = response["results"] || []
-  end
 
     # 🔍 Extra AND-filtering when a title is present
     if query.present?
@@ -144,7 +143,7 @@ class MoviesController < ApplicationController
     api_key = ENV["TMDB_API_KEY"]
     movie_id = params[:id]
     base_url = "https://api.themoviedb.org/3"
-    region   = "US"  # to update to region toggle
+    region = "US"  # to update to region toggle
 
     # Main movie details
     detail_response = HTTParty.get(
@@ -173,6 +172,15 @@ class MoviesController < ApplicationController
     )
 
     @movie = detail_response.parsed_response
+    if user_signed_in?
+      existing = current_user.watchlist_items.find_by(tmdb_id: @movie["id"])
+
+      @in_watchlist = existing&.seen == false
+      @already_seen = existing&.seen == true
+    else
+      @in_watchlist = false
+      @already_seen = false
+    end
 
     # Top 5 cast members
     @cast = (credits_response.parsed_response["cast"] || []).first(5)
@@ -186,7 +194,7 @@ class MoviesController < ApplicationController
 
     region_data = providers_response.parsed_response.dig("results", REGION) || {}
     @streaming = {
-      flatrate:  (region_data["flatrate"] || []) + (region_data["ads"] || []) + (region_data["free"] || []),
+      flatrate: (region_data["flatrate"] || []) + (region_data["ads"] || []) + (region_data["free"] || []),
       rent: region_data["rent"] || [],
       buy: region_data["buy"] || [],
     }
