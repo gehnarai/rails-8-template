@@ -1,0 +1,48 @@
+<h1>🍿 My Watchlist</h1>
+
+<% if @movies.blank? %>
+  <p>Your watchlist is empty.😢 <a href = "/"> Time to explore movies!</p>
+<% else %>
+  <p>You have <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> saved.</p>
+
+  <table role="grid" class="results-table">
+    <thead>
+      <tr>
+        <th>Movie</th>
+        <th>⭐ Rating</th>
+        <th>Release date</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @movies.each do |movie| %>
+        <tr>
+          <td>
+            <a href="/movies/<%= movie["id"] %>">
+              <strong><%= movie["title"] %></strong>
+            </a>
+          </td>
+
+          <td>⭐ <%= (movie["vote_average"] || 0).round(1) %></td>
+
+          <td>
+            <% raw_date = movie["release_date"] %>
+            <% if raw_date.present? %>
+              <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
+            <% end %>
+          </td>
+
+          <td>
+            <!-- Mark seen directly from watchlist -->
+            <form action="/mark_seen" method="post" style="display:inline;">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <input type="hidden" name="tmdb_id" value="<%= movie["id"] %>">
+              <button>👀 Seen</button>
+            </form>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

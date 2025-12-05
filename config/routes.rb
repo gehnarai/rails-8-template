@@ -6,4 +6,10 @@ Rails.application.routes.draw do
   get("/", { :controller => "movies", :action => "index"})
   get("/movies", { :controller => "movies", :action => "index"})
   get("/movies/:id", { :controller => "movies", :action => "show"})
+
+  get("/watchlist", {:controller => "watchlist_items", :action => "index"})
+  get("/seen", {:controller => "watchlist_items", :action => "seen"})
+
+  post("/insert_watchlist_item", {:controller => "watchlist_items", :action => "create"})
+  post("/mark_seen", {:controller => "watchlist_items", :action => "mark_seen"})
 end
