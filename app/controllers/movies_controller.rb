@@ -19,6 +19,8 @@ class MoviesController < ApplicationController
 
     base_url = "https://api.themoviedb.org/3"
 
+    page = (params[:page] || 1).to_i
+
     filter_keys = %w[min_rating max_runtime genre_id query provider]
 
     # to detect if form has ever been submitted
@@ -52,10 +54,11 @@ class MoviesController < ApplicationController
         query: {
           api_key: api_key,
           language: "en-US",
-          sort_by: "vote_average.desc"   # highest rated first
-         # "vote_count.gte": 1000,         # to avoid weird obscure stuff
-         # include_adult: false,
-         # watch_region: REGION,
+          sort_by: "vote_average.desc",
+          page: page,
+        # "vote_count.gte": 1000,         # to avoid weird obscure stuff
+        # include_adult: false,
+        # watch_region: REGION,
         },
       )
 
@@ -72,6 +75,7 @@ class MoviesController < ApplicationController
             query: query,
             include_adult: false,
             watch_region: REGION,
+            page: page,
           },
         )
       else
@@ -82,6 +86,7 @@ class MoviesController < ApplicationController
           sort_by: "popularity.desc",
           include_adult: false,
           region: REGION,
+          page: page,
         }
 
         discover_query[:"vote_average.gte"] = min_rating if min_rating.present?
@@ -106,7 +111,13 @@ class MoviesController < ApplicationController
       @movies = response["results"] || []
     end
 
-    # 🔍 Extra AND-filtering when a title is present
+    body = response.parsed_response
+    @movies = body["results"] || []
+    @page = body["page"] || page
+    @total_pages = body["total_pages"] || 1
+    @total_results = body["total_results"] || @movies.size
+
+    # Extra AND-filtering when a title is present
     if query.present?
       @movies.select! do |m|
         ok = true

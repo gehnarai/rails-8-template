@@ -90,7 +90,7 @@
       <p><%= @suggestion_message %></p>
     <% else %>
 
-    <p>Found <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> for you!</p>
+    <p>Found <%=  number_with_delimiter(@total_results) %> movie<%= "s" if @total_results  != 1 %> for you!</p>
 
     <% end %>
 
@@ -120,5 +120,26 @@
         <% end %>
       </tbody>
     </table>
+
+        <!-- Pagination -->
+    <div class="pagination" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
+      
+      <!-- Previous Page button -->
+      <% if @page.to_i > 1 %>
+        <%= link_to "← Previous", movies_path(request.query_parameters.merge(page: @page.to_i - 1)), class: "pagination-button" %>
+      <% end %>
+
+      <!-- Page indicator -->
+      <span>
+        Page <%= @page %> of <%= @total_pages %>
+      </span>
+
+      <!-- Next Page button -->
+      <% if @page.to_i < @total_pages.to_i %>
+        <%= link_to "Next →", movies_path(request.query_parameters.merge(page: @page.to_i + 1)), class: "pagination-button" %>
+      <% end %>
+
+    </div>
+
   </section>
 <% end %>
