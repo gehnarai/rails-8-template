@@ -42,9 +42,9 @@ class WatchlistItemsController < ApplicationController
     api_key = ENV["TMDB_API_KEY"]
 
     # only UNSEEN items
-    @watchlist_items = current_user.watchlist_items.where(seen: false)
+    @watchlist_items = current_user.watchlist_items.where(seen: false).order(created_at: :asc)
 
-    @movies = @watchlist_items.map do |item|
+    @rows = @watchlist_items.map do |item|
       response = HTTParty.get(
         "#{BASE_URL}/movie/#{item.tmdb_id}",
         query: {
@@ -52,7 +52,10 @@ class WatchlistItemsController < ApplicationController
           language: "en-US",
         },
       )
-      response.parsed_response
+      {
+      item:  item,                    # for created_at, id, etc.
+      movie: response.parsed_response # TMDB data
+    }
     end
 
     render({ :template => "watchlist_items/index" })
@@ -76,5 +79,20 @@ class WatchlistItemsController < ApplicationController
     end
 
     render({ :template => "watchlist_items/seen" })
+  end
+
+  def remove
+  tmdb_id = params[:tmdb_id]
+
+  item = current_user.watchlist_items.find_by(tmdb_id: tmdb_id, seen: false)
+
+  if item
+    item.destroy
+    redirect_back fallback_location: "/watchlist",
+                  notice: "Removed from your watchlist."
+  else
+    redirect_back fallback_location: "/watchlist",
+                  alert: "Could not find that movie in your watchlist."
+  end
   end
 end

@@ -1,22 +1,24 @@
 <h1>🍿 My Watchlist</h1>
 
-<% if @movies.blank? %>
+<% if @rows.blank? %>
   <p>Your watchlist is empty.😢 <a href = "/"> Time to explore movies!</p>
 <% else %>
-  <p>You have <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> saved.</p>
+    <p>You have <%= @rows.size %> movie<%= "s" if @rows.size != 1 %> saved.</p>
 
   <table role="grid" class="results-table">
     <thead>
       <tr>
         <th>Movie</th>
         <th>⭐ Rating</th>
-        <th>Release date</th>
-        <th></th>
+        <th>Added on</th>
+        <th>Actions</th>
       </tr>
     </thead>
 
     <tbody>
-      <% @movies.each do |movie| %>
+      <% @rows.each do |row| %>
+         <% item  = row[:item] %>
+        <% movie = row[:movie] %>
         <tr>
           <td>
             <a href="/movies/<%= movie["id"] %>">
@@ -27,10 +29,7 @@
           <td>⭐ <%= (movie["vote_average"] || 0).round(1) %></td>
 
           <td>
-            <% raw_date = movie["release_date"] %>
-            <% if raw_date.present? %>
-              <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
-            <% end %>
+            <%= item.created_at.in_time_zone("America/Chicago").strftime("%b %-d, %Y") %>
           </td>
 
           <td>
@@ -38,7 +37,18 @@
             <form action="/mark_seen" method="post" style="display:inline;">
               <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
               <input type="hidden" name="tmdb_id" value="<%= movie["id"] %>">
-              <button>👀 Seen</button>
+              <button style="font-size: 0.8rem; padding: 0.1rem 0.4rem;">
+              👀 Seen
+              </button>
+            </form>
+
+            <!-- Remove button (small text) -->
+            <form action="/remove_from_watchlist" method="post">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <input type="hidden" name="tmdb_id" value="<%= movie["id"] %>">
+              <button style="font-size: 0.8rem; padding: 0.1rem 0.4rem;">
+                ❌ Remove
+              </button>
             </form>
           </td>
         </tr>

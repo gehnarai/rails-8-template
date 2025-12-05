@@ -12,4 +12,5 @@ Rails.application.routes.draw do
 
   post("/insert_watchlist_item", {:controller => "watchlist_items", :action => "create"})
   post("/mark_seen", {:controller => "watchlist_items", :action => "mark_seen"})
+  post("/remove_from_watchlist", {:controller => "watchlist_items", :action => "remove"})
 end
