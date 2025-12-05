@@ -3,6 +3,8 @@ class MoviesController < ApplicationController
   # require sign in for movie details page 
   before_action :authenticate_user!, only: [:show]
 
+  REGION = "US".freeze # provider_ids are region specific to keeping it to US only
+
   PROVIDER_IDS = {
     "netflix" => 8,
     "prime" => 9,
@@ -52,7 +54,8 @@ class MoviesController < ApplicationController
           language: "en-US",
           sort_by: "vote_average.desc",   # highest rated first
           "vote_count.gte": 1000,         # to avoid weird obscure stuff
-          include_adult: false
+          include_adult: false,
+          watch_region: REGION 
         }
       )
 
@@ -68,6 +71,7 @@ class MoviesController < ApplicationController
           language: "en-US",
           query: query,
           include_adult: false,
+          watch_region: REGION 
         },
       )
     else
@@ -87,7 +91,8 @@ class MoviesController < ApplicationController
         provider_id = PROVIDER_IDS[provider]
         if provider_id
           discover_query[:with_watch_providers] = provider_id
-          discover_query[:watch_region]         = "US"
+          discover_query[:watch_region]         = REGION
+          discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
         end
       end
 
@@ -173,16 +178,15 @@ class MoviesController < ApplicationController
     @cast = (credits_response.parsed_response["cast"] || []).first(5)
 
     # Streaming
-    region = params[:region].presence || "US"
 
     providers_response = HTTParty.get(
       "#{base_url}/movie/#{movie_id}/watch/providers",
       query: { api_key: api_key },
     )
 
-    region_data = providers_response.parsed_response.dig("results", region) || {}
+    region_data = providers_response.parsed_response.dig("results", REGION) || {}
     @streaming = {
-      flatrate: region_data["flatrate"] || [],
+      flatrate:  (region_data["flatrate"] || []) + (region_data["ads"] || []) + (region_data["free"] || []),
       rent: region_data["rent"] || [],
       buy: region_data["buy"] || [],
     }
