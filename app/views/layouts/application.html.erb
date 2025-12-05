@@ -57,7 +57,7 @@
                 <a href="/watchlist">My Watchlist</a>
               </li>
               <li>
-                <a href="/seen">Movie History</a>
+                <a href="/seen">Watched Archive</a>
               </li>
           </ul>
            <% end %>
@@ -89,6 +89,15 @@
 
     <main>
       <div class="container-two-thirds">
+        <div class="text-success">
+          <% if notice.present? %>
+            <p><%= notice.html_safe %></p>
+          <% end %>
+        </div>
+
+        <div class="text-danger">
+          <%= alert %>
+        </div>
         <%= yield %>
       </div>
     </main>

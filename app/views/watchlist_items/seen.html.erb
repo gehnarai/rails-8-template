@@ -1,0 +1,38 @@
+<h1>Your Watched Archive</h1>
+
+<% if @movies.blank? %>
+  <p>You haven't marked any movies as seen yet 🤭. </p>
+<% else %>
+  <p>You’ve marked <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> as seen.</p>
+
+  <table role="grid" class="results-table">
+    <thead>
+      <tr>
+        <th>Movie</th>
+        <th>⭐ Rating</th>
+        <th>Release date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @movies.each do |movie| %>
+        <tr>
+          <td>
+            <a href="/movies/<%= movie["id"] %>">
+              <strong><%= movie["title"] %></strong>
+            </a>
+          </td>
+
+          <td>⭐ <%= (movie["vote_average"] || 0).round(1) %></td>
+
+          <td>
+            <% raw_date = movie["release_date"] %>
+            <% if raw_date.present? %>
+              <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

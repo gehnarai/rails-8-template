@@ -1,7 +1,7 @@
 class WatchlistItemsController < ApplicationController
   before_action :authenticate_user!
 
-  REGION   = "US".freeze
+  REGION = "US".freeze
   BASE_URL = "https://api.themoviedb.org/3".freeze
 
   def create
@@ -14,9 +14,11 @@ class WatchlistItemsController < ApplicationController
     item.seen = false
 
     if item.save
-      redirect_to "/watchlist", notice: "Added to your watchlist."
+      redirect_back fallback_location: "/",
+                    notice: "Added to your <a href ='/watchlist'>watchlist! </a>"
     else
-      redirect_back fallback_location: "/", alert: "Could not add to watchlist."
+      redirect_back fallback_location: "/",
+                    alert: "Something went wrong. Please try again."
     end
   end
 
@@ -28,9 +30,11 @@ class WatchlistItemsController < ApplicationController
     item.seen = true
 
     if item.save
-      redirect_to "/seen", notice: "Marked as seen."
-    else
-      redirect_back fallback_location: "/", alert: "Could not update movie."
+    redirect_back fallback_location: "/",
+                  notice: "Added to your <a href='/seen'>watched archive!</a>"
+  else
+    redirect_back fallback_location: "/",
+                  alert: "Something went wrong. Please try again."
     end
   end
 
@@ -45,13 +49,13 @@ class WatchlistItemsController < ApplicationController
         "#{BASE_URL}/movie/#{item.tmdb_id}",
         query: {
           api_key: api_key,
-          language: "en-US"
-        }
+          language: "en-US",
+        },
       )
       response.parsed_response
     end
 
-    render({:template => "watchlist_items/index"})
+    render({ :template => "watchlist_items/index" })
   end
 
   def seen
@@ -65,12 +69,12 @@ class WatchlistItemsController < ApplicationController
         "#{BASE_URL}/movie/#{item.tmdb_id}",
         query: {
           api_key: api_key,
-          language: "en-US"
-        }
+          language: "en-US",
+        },
       )
       response.parsed_response
     end
 
-    render({:template => "watchlist_items/seen"})
+    render({ :template => "watchlist_items/seen" })
   end
 end
