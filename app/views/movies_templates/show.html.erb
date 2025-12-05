@@ -39,12 +39,14 @@
 
       <!-- Buttons -->
 <div class="movie-actions">
-  <form action="/insert_watchlist_item" method="post">
+    <form action="/insert_watchlist_item" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
     <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
     <button>🍿 Add to Watchlist</button>
   </form>
 
   <form action="/mark_seen" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
     <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
     <button>👀 Already seen</button>
   </form>
