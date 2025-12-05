@@ -30,11 +30,11 @@ class WatchlistItemsController < ApplicationController
     item.seen = true
 
     if item.save
-    redirect_back fallback_location: "/",
-                  notice: "Added to your <a href='/seen'>watched archive!</a>"
-  else
-    redirect_back fallback_location: "/",
-                  alert: "Something went wrong. Please try again."
+      redirect_back fallback_location: "/",
+                    notice: "Added to your <a href='/seen'>watched archive!</a>"
+    else
+      redirect_back fallback_location: "/",
+                    alert: "Something went wrong. Please try again."
     end
   end
 
@@ -53,9 +53,9 @@ class WatchlistItemsController < ApplicationController
         },
       )
       {
-      item:  item,                    # for created_at, id, etc.
-      movie: response.parsed_response # TMDB data
-    }
+        item: item,                    # for created_at, id, etc.
+        movie: response.parsed_response, # TMDB data
+      }
     end
 
     render({ :template => "watchlist_items/index" })
@@ -65,9 +65,9 @@ class WatchlistItemsController < ApplicationController
     api_key = ENV["TMDB_API_KEY"]
 
     # only SEEN items
-    @seen_items = current_user.watchlist_items.where(seen: true)
+    @seen_items = current_user.watchlist_items.where(seen: true).order(updated_at: :desc)
 
-    @movies = @seen_items.map do |item|
+    @rows = @seen_items.map do |item|
       response = HTTParty.get(
         "#{BASE_URL}/movie/#{item.tmdb_id}",
         query: {
@@ -75,24 +75,40 @@ class WatchlistItemsController < ApplicationController
           language: "en-US",
         },
       )
-      response.parsed_response
+      {
+        item: item,
+        movie: response.parsed_response,
+      }
     end
 
     render({ :template => "watchlist_items/seen" })
   end
 
   def remove
-  tmdb_id = params[:tmdb_id]
+    tmdb_id = params[:tmdb_id]
 
-  item = current_user.watchlist_items.find_by(tmdb_id: tmdb_id, seen: false)
+    item = current_user.watchlist_items.find_by(tmdb_id: tmdb_id, seen: false)
 
-  if item
-    item.destroy
-    redirect_back fallback_location: "/watchlist",
-                  notice: "Removed from your watchlist."
-  else
-    redirect_back fallback_location: "/watchlist",
-                  alert: "Could not find that movie in your watchlist."
+    if item
+      item.destroy
+      redirect_back fallback_location: "/watchlist",
+                    notice: "Removed from your watchlist."
+    else
+      redirect_back fallback_location: "/watchlist",
+                    alert: "Could not find that movie in your watchlist."
+    end
   end
+
+  def remove_from_seen
+    tmdb_id = params[:tmdb_id]
+
+    item = current_user.watchlist_items.find_by(tmdb_id: tmdb_id, seen: true)
+
+    if item
+      item.destroy
+      redirect_to "/seen", notice: "Removed from your seen archive."
+    else
+      redirect_to "/seen", alert: "Couldn’t find that movie in your seen archive."
+    end
   end
 end

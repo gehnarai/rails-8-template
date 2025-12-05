@@ -1,21 +1,23 @@
 <h1>Your Watched Archive</h1>
 
-<% if @movies.blank? %>
+<% if @rows.blank? %>
   <p>You haven't marked any movies as seen yet 🤭. </p>
 <% else %>
-  <p>You’ve marked <%= @movies.size %> movie<%= "s" if @movies.size != 1 %> as seen.</p>
+  <p>You’ve marked <%= @rows.size %> movie<%= "s" if @rows.size != 1 %> as seen.</p>
 
   <table role="grid" class="results-table">
     <thead>
       <tr>
         <th>Movie</th>
-        <th>⭐ Rating</th>
-        <th>Release date</th>
+        <th>Marked seen on</th>
+        <th>Actions</th>
       </tr>
     </thead>
 
     <tbody>
-      <% @movies.each do |movie| %>
+      <% @rows.each do |row| %>
+       <% item  = row[:item] %>
+        <% movie = row[:movie] %>
         <tr>
           <td>
             <a href="/movies/<%= movie["id"] %>">
@@ -23,13 +25,18 @@
             </a>
           </td>
 
-          <td>⭐ <%= (movie["vote_average"] || 0).round(1) %></td>
+        <td>
+          <%= item.updated_at.in_time_zone("America/Chicago").strftime("%b %-d, %Y") %>
+        </td>
 
           <td>
-            <% raw_date = movie["release_date"] %>
-            <% if raw_date.present? %>
-              <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
-            <% end %>
+              <!-- Remove from seen = delete the row OR set seen=false? -->
+            <form action="/remove_from_seen" method="post">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <input type="hidden" name="tmdb_id" value="<%= movie["id"] %>">
+              <button style="font-size: 0.8rem; padding: 0.1rem 0.4rem;"> ❌ Remove
+              </button>
+            </form>
           </td>
         </tr>
       <% end %>
