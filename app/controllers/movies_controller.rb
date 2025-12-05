@@ -46,16 +46,16 @@ class MoviesController < ApplicationController
     ].any?(&:present?)
 
     if !filters_present
-      # if no fields field, show a default recommendations list
+      # if no fields field, show trednding movies
       response = HTTParty.get(
-        "#{base_url}/discover/movie",
+        "#{base_url}/trending/movie/week",
         query: {
           api_key: api_key,
           language: "en-US",
-          sort_by: "vote_average.desc",   # highest rated first
-          "vote_count.gte": 1000,         # to avoid weird obscure stuff
-          include_adult: false,
-          watch_region: REGION,
+          sort_by: "vote_average.desc"   # highest rated first
+         # "vote_count.gte": 1000,         # to avoid weird obscure stuff
+         # include_adult: false,
+         # watch_region: REGION,
         },
       )
 
