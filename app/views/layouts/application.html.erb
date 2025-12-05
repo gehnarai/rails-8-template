@@ -32,23 +32,78 @@
 
   </head>
 
- <body class="pico">
-  <header>
-    <div class="container-two-thirds">
-      <nav>
-        <!-- Navigation here -->
-      </nav>
-    </div>
-  </header>
+  <body class="pico">
+    <header>
+      <div class="container-two-thirds">
+        <nav>
+          <!-- Left: App name -->
+          <ul>
+            <li>
+              <a href="/">
+                <strong>ChoozayMovie</strong>
+              </a>
+            </li>
+          </ul>
 
-  <main>
-    <div class="container-two-thirds">
-      <%= yield %>
-    </div>
-  </main>
+          <!-- Center: main sections -->
+          <ul>
+            <li>
+              <a href="/">Home</a>
+            </li>
 
-  <footer>
-    <!-- Footer content -->
-  </footer>
-</body>
+            <% if user_signed_in? %>
+              <li>
+                <a href="/watchlist">My Watchlist</a>
+              </li>
+              <li>
+                <a href="/seen">Movie History</a>
+              </li>
+            <% else %>
+              <!-- Not signed in: send them to login if they click these -->
+              <li>
+                <a href="/users/sign_in">My Watchlist</a>
+              </li>
+              <li>
+                <a href="/users/sign_in"></a>
+              </li>
+            <% end %>
+          </ul>
+
+          <!-- Right: region + user actions -->
+          <ul>
+            <li>
+              <!-- placeholder for now; later this can be a dropdown -->
+              <a href="#">Region: US</a>
+            </li>
+
+            <% if user_signed_in? %>
+              <li>
+                <a href="/users/edit">Edit profile</a>
+              </li>
+              <li>
+                <a href="/users/sign_out">Sign out</a>
+              </li>
+            <% else %>
+              <li>
+                <a href="/users/sign_in">Log in</a>
+              </li>
+              <li>
+                <a href="/users/sign_up">Sign up</a>
+              </li>
+            <% end %>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container-two-thirds">
+        <%= yield %>
+      </div>
+    </main>
+
+    <footer>
+      <!-- Footer content -->
+    </footer>
+  </body>
 </html>
