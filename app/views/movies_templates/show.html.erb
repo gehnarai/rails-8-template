@@ -35,115 +35,123 @@
           <% else %>
             Not listed
           <% end %>
+
+          <% languages = (@movie["spoken_languages"] || []) %>
+          <% if languages.any? %>
+            <p>
+              <strong>🗣️ Language:</strong>
+              <%= languages.map { |lang| lang["english_name"] || lang["name"] }.join(", ") %>
+            </p>
+          <% end %>
         </p>
 
         <!-- Buttons -->
         <div class="movie-actions">
 
-        <!-- Already seen the movie-->
+          <!-- Already seen the movie-->
           <% if @already_seen %>
-          <a href = "/seen" role = "button">
-          👀 You’ve seen this
-          </a>
-       
-           <span>Want to watch it again?</span>
+            <a href = "/seen" role = "button">
+              👀 You’ve seen this
+            </a>
 
-           <!-- Add back to watchlist -->
+            <span>Want to watch it again?</span>
+
+            <!-- Add back to watchlist -->
             <form action="/insert_watchlist_item" method="post">
               <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
               <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
               <button>🍿 Add to Watchlist</button>
             </form>
 
-          <!-- In watchlist but not seen -->
+            <!-- In watchlist but not seen -->
           <% elsif @in_watchlist %>
             <a href = "/watchlist" role = "button">
-            🍿 Part of your watchlist</button>
-            </a>
-             <form action="/mark_seen" method="post">
-              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-              <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
-              <button>👀 Already seen</button>
-            </form>
+              🍿 Part of your watchlist</button>
+          </a>
+          <form action="/mark_seen" method="post">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
+            <button>👀 Already seen</button>
+          </form>
 
-          <% else %>
-            <!-- Brand new movie -->
-            <form action="/insert_watchlist_item" method="post">
-              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-              <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
-              <button>🍿 Add to Watchlist</button>
-            </form>
+        <% else %>
+          <!-- Brand new movie -->
+          <form action="/insert_watchlist_item" method="post">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
+            <button>🍿 Add to Watchlist</button>
+          </form>
 
-            <!-- Mark as seen-->
-            <form action="/mark_seen" method="post">
-              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-              <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
-              <button>👀 Already seen</button>
-            </form>
-          <%end%>
+          <!-- Mark as seen-->
+          <form action="/mark_seen" method="post">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            <input type="hidden" name="tmdb_id" value="<%= @movie["id"] %>">
+            <button>👀 Already seen</button>
+          </form>
+        <%end%>
 
-        </div>
       </div>
     </div>
+  </div>
 
-    <!-- Overview -->
-    <section style="margin-top: 2rem;">
-      <h2>🔎 Overview </h2>
-      <p><%= @movie["overview"] %></p>
-    </section>
+  <!-- Overview -->
+  <section style="margin-top: 2rem;">
+    <h2>🔎 Overview </h2>
+    <p><%= @movie["overview"] %></p>
+  </section>
 
-    <!-- Cast -->
-    <section style="margin-top: 1.5rem;">
-      <h2>🎬 Cast</h2>
-      <% if @cast.present? %>
+  <!-- Cast -->
+  <section style="margin-top: 1.5rem;">
+    <h2>🎬 Cast</h2>
+    <% if @cast.present? %>
+      <ul>
+        <% @cast.each do |person| %>
+          <li>
+            <strong><%= person["name"] %></strong>
+            <% if person["character"].present? %>
+              as <%= person["character"] %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No cast information available.</p>
+    <% end %>
+  </section>
+
+  <!-- Where to watch -->
+  <section style="margin-top: 1.5rem;">
+    <h2>📺 Where to watch</h2>
+
+    <% if @streaming[:flatrate].present? || @streaming[:rent].present? || @streaming[:buy].present? %>
+      <% if @streaming[:flatrate].present? %>
+        <p><strong>Streaming:</strong></p>
         <ul>
-          <% @cast.each do |person| %>
-            <li>
-              <strong><%= person["name"] %></strong>
-              <% if person["character"].present? %>
-                as <%= person["character"] %>
-              <% end %>
-            </li>
+          <% @streaming[:flatrate].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
           <% end %>
         </ul>
-      <% else %>
-        <p>No cast information available.</p>
       <% end %>
-    </section>
 
-    <!-- Where to watch -->
-    <section style="margin-top: 1.5rem;">
-      <h2>📺 Where to watch</h2>
-
-      <% if @streaming[:flatrate].present? || @streaming[:rent].present? || @streaming[:buy].present? %>
-        <% if @streaming[:flatrate].present? %>
-          <p><strong>Streaming:</strong></p>
-          <ul>
-            <% @streaming[:flatrate].each do |prov| %>
-              <li><%= prov["provider_name"] %></li>
-            <% end %>
-          </ul>
-        <% end %>
-
-        <% if @streaming[:rent].present? %>
-          <p><strong>Rent:</strong></p>
-          <ul>
-            <% @streaming[:rent].each do |prov| %>
-              <li><%= prov["provider_name"] %></li>
-            <% end %>
-          </ul>
-        <% end %>
-
-        <% if @streaming[:buy].present? %>
-          <p><strong>Buy:</strong></p>
-          <ul>
-            <% @streaming[:buy].each do |prov| %>
-              <li><%= prov["provider_name"] %></li>
-            <% end %>
-          </ul>
-        <% end %>
-      <% else %>
-        <p>Not currently available on major streaming services in US (according to TMDB).</p>
+      <% if @streaming[:rent].present? %>
+        <p><strong>Rent:</strong></p>
+        <ul>
+          <% @streaming[:rent].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
+          <% end %>
+        </ul>
       <% end %>
-    </section>
-  </article>
+
+      <% if @streaming[:buy].present? %>
+        <p><strong>Buy:</strong></p>
+        <ul>
+          <% @streaming[:buy].each do |prov| %>
+            <li><%= prov["provider_name"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% else %>
+      <p>Not currently available on major streaming services in US (according to TMDB).</p>
+    <% end %>
+  </section>
+</article>
