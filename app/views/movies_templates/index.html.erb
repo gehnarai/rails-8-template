@@ -15,13 +15,13 @@
         placeholder="E.g. Parasite, Gladiator..."
         value="<%= params[:query] %>"
       >
-    </div>
+      </div>
 
-    <div>
-      <label for="genre_field">🎭 Genre</label>
-      <select id="genre_field" name="genre_id">
-        <option value="">Any genre</option>
-        <option value="28"   <%= "selected" if params[:genre_id] == "28" %>>Action</option>
+      <div>
+        <label for="genre_field">🎭 Genre</label>
+        <select id="genre_field" name="genre_id">
+          <option value="">Any genre</option>
+          <option value="28"   <%= "selected" if params[:genre_id] == "28" %>>Action</option>
         <option value="35"   <%= "selected" if params[:genre_id] == "35" %>>Comedy</option>
         <option value="18"   <%= "selected" if params[:genre_id] == "18" %>>Drama</option>
         <option value="27"   <%= "selected" if params[:genre_id] == "27" %>>Horror</option>
@@ -33,7 +33,7 @@
     </div>
 
     <div>
-      <label for="min_rating_field">⭐ Min rating (0–10)</label>
+      <label for="min_rating_field">⭐ Minimum rating (0–10)</label>
       <input
         id="min_rating_field"
         type="number"
@@ -43,24 +43,24 @@
         max="10"
         step="0.5"
       >
-    </div>
+          </div>
 
-    <div>
-      <label for="max_runtime_field">⏱ Max runtime (minutes)</label>
-      <input
+          <div>
+            <label for="max_runtime_field">⏱ Maximum runtime (minutes)</label>
+            <input
         id="max_runtime_field"
         type="number"
         name="max_runtime"
         value="<%= params[:max_runtime] %>"
         min="30"
       >
-    </div>
+            </div>
 
-    <div>
-      <label for="provider_field">📺 Where to watch</label>
-      <select id="provider_field" name="provider">
-        <option value="">Any service</option>
-        <option value="apple_tv"   <%= "selected" if params[:provider] == "apple_tv" %>>Apple TV</option>
+            <div>
+              <label for="provider_field">📺 Where to watch</label>
+              <select id="provider_field" name="provider">
+                <option value="">Any service</option>
+                <option value="apple_tv"   <%= "selected" if params[:provider] == "apple_tv" %>>Apple TV</option>
         <option value="disney"  <%= "selected" if params[:provider] == "disney" %>>Disney+</option>
          <option value="hbo_max"    <%= "selected" if params[:provider] == "hbo_max" %>>HBO Max</option>
              <option value="hulu"    <%= "selected" if params[:provider] == "hulu" %>>Hulu</option>
@@ -69,7 +69,7 @@
       </select>
     </div>
     </div>
-
+ 
   <div style="text-align: center; margin-top: 1rem;">
     <button style="margin-right: 1rem;">🎬 Find movies</button>
     <a href="/">Clear filters</a>
@@ -78,68 +78,68 @@
 
 <% if params[:query].present? && (params[:provider].present? || params[:max_runtime].present?) %>
   <p style="font-size: 0.8rem; opacity: 0.7; margin-top: -0.5rem; color: red">
-    ℹ️ Note: When searching by title, "Max runtime" and “Where to watch” filters don't apply due to API limitations.
-  </p>
-<% end %>
-
-<% if @movies.present? %>
-  <section style="margin-top: 2rem;">
-    <h2>Results</h2>
-
-    <% if @suggestion_message.present? %>
-      <p><%= @suggestion_message %></p>
-    <% else %>
-
-    <p>Found <%=  number_with_delimiter(@total_results) %> movie<%= "s" if @total_results  != 1 %> for you!</p>
-
-    <% end %>
-
-    <table role="grid" class="results-table">
-      <thead>
-        <tr>
-          <th>Movie</th>
-          <th> ⭐ Rating </th>
-          <th>Release date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @movies.each do |movie| %>
-          <tr>
-            <td>
-              <a href="/movies/<%= movie["id"] %>">
-              <strong><%= movie["title"] %></strong>
-              </a>
-            </td>
-            <td><%= (movie["vote_average"] || 0).round(1) %></td>
-            <td>  <% raw_date = movie["release_date"] %>
-              <% if raw_date.present? %>
-                <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
+                  ℹ️ Note: When searching by title, "Max runtime" and “Where to watch” filters don't apply due to API limitations.
+                </p>
               <% end %>
-              </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
 
-        <!-- Pagination -->
-    <div class="pagination" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
-      
-      <!-- Previous Page button -->
-      <% if @page.to_i > 1 %>
-        <%= link_to "← Previous", movies_path(request.query_parameters.merge(page: @page.to_i - 1)), class: "pagination-button" %>
-      <% end %>
+              <% if @movies.present? %>
+                <section style="margin-top: 2rem;">
+                  <h2>Results</h2>
 
-      <!-- Page indicator -->
-      <span>
-        Page <%= @page %> of <%= @total_pages %>
-      </span>
+                  <% if @suggestion_message.present? %>
+                    <p><%= @suggestion_message %></p>
+                  <% else %>
 
-      <!-- Next Page button -->
-      <% if @page.to_i < @total_pages.to_i %>
-        <%= link_to "Next →", movies_path(request.query_parameters.merge(page: @page.to_i + 1)), class: "pagination-button" %>
-      <% end %>
+                    <p>Found <%=  number_with_delimiter(@total_results) %> movie<%= "s" if @total_results  != 1 %> for you!</p>
 
-    </div>
+                  <% end %>
 
-  </section>
-<% end %>
+                  <table role="grid" class="results-table">
+                    <thead>
+                      <tr>
+                        <th>Movie</th>
+                        <th> ⭐ Rating </th>
+                        <th>Release date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% @movies.each do |movie| %>
+                        <tr>
+                          <td>
+                            <a href="/movies/<%= movie["id"] %>">
+                              <strong><%= movie["title"] %></strong>
+                            </a>
+                          </td>
+                          <td><%= (movie["vote_average"] || 0).round(1) %></td>
+                          <td>  <% raw_date = movie["release_date"] %>
+                            <% if raw_date.present? %>
+                              <%= Date.parse(raw_date).strftime("%b %-d, %Y") %>
+                            <% end %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+
+                  <!-- Pagination -->
+                  <div class="pagination" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
+
+                    <!-- Previous Page button -->
+                    <% if @page.to_i > 1 %>
+                      <%= link_to "← Previous", movies_path(request.query_parameters.merge(page: @page.to_i - 1)), class: "pagination-button" %>
+                    <% end %>
+
+                    <!-- Page indicator -->
+                    <span>
+                      Page <%= @page %> of <%= @total_pages %>
+                    </span>
+
+                    <!-- Next Page button -->
+                    <% if @page.to_i < @total_pages.to_i %>
+                      <%= link_to "Next →", movies_path(request.query_parameters.merge(page: @page.to_i + 1)), class: "pagination-button" %>
+                    <% end %>
+
+                  </div>
+
+                </section>
+              <% end %>
