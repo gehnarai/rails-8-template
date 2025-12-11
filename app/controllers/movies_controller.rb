@@ -10,7 +10,6 @@ class MoviesController < ApplicationController
     "prime" => 9,
     "disney" => 337,
     "hulu" => 15,
-    "apple_tv" => 2,
     "hbo_max" => 1899,
   }.freeze
 
@@ -101,7 +100,8 @@ class MoviesController < ApplicationController
             discover_query[:with_watch_monetization_types] = "flatrate|ads|free"
           end
         else
-          # ifo specific provider filter
+          # if no specific provider filter
+          discover_query[:watch_region] = REGION
           discover_query[:with_watch_monetization_types] = "flatrate|ads|free|rent|buy"
         end
 
@@ -116,6 +116,30 @@ class MoviesController < ApplicationController
     @page = body["page"] || page
     @total_pages = body["total_pages"] || 1
     @total_results = body["total_results"] || @movies.size
+
+    # Extra provider filtering: keep only movies that are *streamable* on the selected provider
+if provider.present? && query.blank?
+  provider_id = PROVIDER_IDS[provider]
+
+  if provider_id
+    @movies.select! do |m|
+      providers_response = HTTParty.get(
+        "#{base_url}/movie/#{m["id"]}/watch/providers",
+        query: { api_key: api_key }
+      )
+
+      region_data = providers_response.parsed_response.dig("results", REGION) || {}
+
+      streaming_offers = []
+      streaming_offers += region_data["flatrate"] || []
+      streaming_offers += region_data["ads"]      || []
+      streaming_offers += region_data["free"]     || []
+
+      #  keep only if THIS provider appears in the streaming offers
+      streaming_offers.any? { |offer| offer["provider_id"] == provider_id }
+    end
+  end
+end
 
     # Extra AND-filtering when a title is present
     if query.present?
