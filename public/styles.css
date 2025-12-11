@@ -14,3 +14,21 @@
   list-style-type: none;
   padding-left: 0;
 }
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));  /* fewer, wider columns */
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+}
+
+/* already good */
+.filters-row label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.filters-row input,
+.filters-row select {
+  width: 100%;
+}
