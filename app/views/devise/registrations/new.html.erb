@@ -1,29 +1,52 @@
 <h2>Sign up</h2>
 
-<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= f.error_notification %>
-
-  <div class="form-inputs">
-  <%= f.input :name,
-            required: true,
-            autofocus: true,
-            input_html: { autocomplete: "name" } %>
-    <%= f.input :email,
-                required: true,
-                autofocus: true,
-                input_html: { autocomplete: "email" }%>
-    <%= f.input :password,
-                required: true,
-                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :password_confirmation,
-                required: true,
-                input_html: { autocomplete: "new-password" } %>
-  </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Sign up" %>
+<% if resource.errors.any? %>
+  <div class="error-notification">
+    <p>Please review the problems below:</p>
+    <ul>
+      <% resource.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
   </div>
 <% end %>
 
-<%= render "devise/shared/links" %>
+<%= simple_form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f| %>
+  <div class="form-inputs">
+    <%= f.input(:name,
+      :required => true,
+      :autofocus => true,
+      :error => false,
+      :input_html => { :autocomplete => "name" }
+    ) %>
+
+    <%= f.input(:email,
+      :required => true,
+      :error => false,
+      :input_html => { :autocomplete => "email" }
+    ) %>
+
+    <div class="input password required">
+      <%= f.label(:password) %>
+      <div class="password-hint">(6 characters minimum)</div>
+      <%= f.password_field(:password,
+        :required => true,
+        :autocomplete => "new-password"
+      ) %>
+      <!-- remove the inline error -->
+      <!-- <%= f.error(:password) %> -->
+    </div>
+
+    <%= f.input(:password_confirmation,
+      :required => true,
+      :error => false,
+      :input_html => { :autocomplete => "new-password" }
+    ) %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button(:submit, "Sign up") %>
+  </div>
+<% end %>
+
+<%= render("devise/shared/links") %>

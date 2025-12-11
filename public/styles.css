@@ -1,0 +1,16 @@
+ /* Hide Simple Form required asterisks */
+ abbr[title="required"],
+ .asterisk {
+   display: none;
+ }
+
+.password-hint {
+  font-style: italic;
+  font-size: 0.9rem;   /* optional */
+  margin-bottom: 4px;  /* space between hint and box */
+}
+
+.error-notification ul {
+  list-style-type: none;
+  padding-left: 0;
+}

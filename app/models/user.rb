@@ -24,4 +24,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
 has_many :watchlist_items, dependent: :destroy
+
+validates(:name, :presence => true)
+validates(:email, :presence => true)
+validates(:password, :presence => true)
 end
