@@ -4,16 +4,22 @@
    display: none;
  }
 
+/* format password hint */ 
+
 .password-hint {
   font-style: italic;
   font-size: 0.9rem;   /* optional */
   margin-bottom: 4px;  /* space between hint and box */
 }
 
+/* format alters */
+
 .error-notification ul {
   list-style-type: none;
   padding-left: 0;
 }
+
+/* center and increase length of boxes */
 
 .filters-row {
   display: grid;
@@ -31,4 +37,18 @@
 .filters-row input,
 .filters-row select {
   width: 100%;
+}
+
+/* Put "Clear filters" in the empty grid cell under Min rating */
+
+.clear-filters-cell {
+  grid-column: 3;
+  grid-row: 2;
+
+  display: flex;
+  justify-content: center;   /* center horizontally in that empty cell */
+  align-items: center;       /* center vertically within the row */
+
+ position: relative; 
+  top: -45px;     
 }
